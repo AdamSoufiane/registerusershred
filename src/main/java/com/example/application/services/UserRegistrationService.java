@@ -2,13 +2,15 @@ package com.example.application.services;
 
 import com.example.application.dtos.UserRegistrationRequest;
 import com.example.application.dtos.UserRegistrationResponse;
+import com.example.domain.entities.IUserEntityFactory;
+import com.example.domain.entities.NotificationDetails;
+import com.example.domain.entities.NotificationType;
 import com.example.domain.entities.UserEntity;
+import com.example.domain.exceptions.InvalidUserDetailsException;
+import com.example.domain.exceptions.NotificationException;
 import com.example.domain.exceptions.UserRegistrationException;
 import com.example.domain.ports.UserRepositoryPort;
 import com.example.application.ports.NotificationOutputPort;
-import com.example.domain.entities.UserEntityFactory;
-import com.example.domain.entities.NotificationDetails;
-import com.example.domain.exceptions.NotificationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +25,13 @@ public class UserRegistrationService {
 
     private final UserRepositoryPort userRepositoryPort;
     private final NotificationOutputPort notificationOutputPort;
-    private final UserEntityFactory userEntityFactory;
+    private final IUserEntityFactory userEntityFactory;
     private final Validator validator;
 
     @Autowired
     public UserRegistrationService(UserRepositoryPort userRepositoryPort,
                                    NotificationOutputPort notificationOutputPort,
-                                   UserEntityFactory userEntityFactory,
+                                   IUserEntityFactory userEntityFactory,
                                    Validator validator) {
         this.userRepositoryPort = userRepositoryPort;
         this.notificationOutputPort = notificationOutputPort;
@@ -53,7 +55,11 @@ public class UserRegistrationService {
             UserEntity savedUser = userRepositoryPort.save(userEntity);
 
             // Send out a notification
-            NotificationDetails details = new NotificationDetails(savedUser.getEmail(), "Welcome to our service!", NotificationDetails.NotificationType.REGISTRATION_CONFIRMATION);
+            NotificationDetails details = new NotificationDetails();
+            details.setRecipientEmail(savedUser.getEmail());
+            details.setMessageSubject("Welcome to our service!");
+            details.setMessageBody("Your account has been successfully created.");
+            details.setNotificationType(NotificationType.EMAIL);
             notificationOutputPort.sendNotification(details);
 
             // Construct and return the response
@@ -62,6 +68,8 @@ public class UserRegistrationService {
             throw new UserRegistrationException("Validation failed: " + ex.getConstraintViolations().toString());
         } catch (NotificationException ex) {
             throw new UserRegistrationException("Failed to send registration confirmation email.", ex);
+        } catch (InvalidUserDetailsException ex) {
+            throw new UserRegistrationException("Invalid user details provided.", ex);
         }
     }
 }

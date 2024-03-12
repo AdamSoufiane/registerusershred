@@ -1,5 +1,6 @@
 package com.example.infrastructure.exceptions;
 
+import com.example.adapters.primary.UserControllerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -4,7 +4,6 @@ import com.example.application.ports.NotificationOutputPort;
 import com.example.domain.entities.NotificationDetails;
 import com.example.domain.exceptions.NotificationException;
 import com.example.infrastructure.external_services.exceptions.EmailSendingException;
-import com.example.infrastructure.external_services.exceptions.ServiceProviderValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +24,8 @@ public class EmailServiceAdapter implements NotificationOutputPort {
             validateEmailServiceProvider();
             emailServiceProvider.sendEmail(details.getRecipient(), details.getMessage());
             handleSuccessfulEmailDelivery(details.getRecipient(), details.getMessage());
-        } catch (ServiceProviderValidationException e) {
-            throw new NotificationException("Email service provider validation failed", e);
         } catch (EmailSendingException e) {
-            logEmailSendingError(e, details.getRecipient(), details.getMessage());
+            log.error("Failed to send email to {} with message: {}. Error: ", details.getRecipient(), details.getMessage(), e);
             boolean retrySuccessful = retrySendingEmail(details.getRecipient(), details.getMessage());
             if (!retrySuccessful) {
                 handleRetryFailure(details.getRecipient(), details.getMessage());
@@ -37,9 +34,9 @@ public class EmailServiceAdapter implements NotificationOutputPort {
         }
     }
 
-    private void validateEmailServiceProvider() throws ServiceProviderValidationException {
+    private void validateEmailServiceProvider() throws EmailSendingException {
         if (emailServiceProvider == null || !emailServiceProvider.isConfigured()) {
-            throw new ServiceProviderValidationException("Email service provider is not initialized or properly configured.");
+            throw new EmailSendingException("Email service provider is not initialized or properly configured.");
         }
     }
 
@@ -73,8 +70,3 @@ public class EmailServiceAdapter implements NotificationOutputPort {
         // TODO: Implement notification to an operations team or incident management system for failures that exceed the maximum retry attempts
     }
 }
-
-// TODO: Extract the ServiceProviderValidationException class to its own file in the package com.example.infrastructure.external_services.exceptions
-// TODO: Extract the EmailSendingException class to its own file in the package com.example.infrastructure.external_services.exceptions
-// TODO: Ensure that the EmailServiceProvider class has a method 'sendEmail(String recipient, String message)' that throws 'EmailSendingException'.
-// TODO: Ensure that the EmailServiceProvider class has a method 'isConfigured()' that returns a boolean indicating if the provider is properly configured.

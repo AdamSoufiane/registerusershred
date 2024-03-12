@@ -21,25 +21,19 @@ public class NotificationException extends Exception {
         this.timestamp = System.currentTimeMillis();
     }
 
+    public NotificationException(String message, Throwable cause) {
+        super(message, cause);
+        this.timestamp = System.currentTimeMillis();
+    }
+
     public NotificationException(String errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
         this.timestamp = System.currentTimeMillis();
     }
 
-    public NotificationException(String message, Throwable cause) {
-        super(message, cause);
-        this.timestamp = System.currentTimeMillis();
-    }
-
     public NotificationException(String errorCode, String message, Throwable cause) {
         super(message, cause);
-        this.errorCode = errorCode;
-        this.timestamp = System.currentTimeMillis();
-    }
-
-    public NotificationException(String errorCode) {
-        super();
         this.errorCode = errorCode;
         this.timestamp = System.currentTimeMillis();
     }
@@ -53,5 +47,4 @@ public class NotificationException extends Exception {
                 ", cause=" + getCause() +
                 '}';
     }
-
 }

@@ -2,9 +2,12 @@ package com.example.application.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,11 +15,12 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Objects;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class UserRegistrationRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,36 +49,5 @@ public class UserRegistrationRequest implements Serializable {
         this.password = password;
         this.fullName = fullName;
         this.creationTimestamp = Instant.now();
-    }
-
-    @Override
-    public String toString() {
-        return "UserRegistrationRequest{" +
-                "email='" + email + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", creationTimestamp=" + creationTimestamp +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserRegistrationRequest that = (UserRegistrationRequest) o;
-
-        if (!Objects.equals(email, that.email)) return false;
-        if (!Objects.equals(password, that.password)) return false;
-        if (!Objects.equals(fullName, that.fullName)) return false;
-        return Objects.equals(creationTimestamp, that.creationTimestamp);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(email, password, fullName, creationTimestamp);
-    }
-
-    public UserRegistrationRequest copy() {
-        return new UserRegistrationRequest(this.email, this.password, this.fullName);
     }
 }

@@ -21,7 +21,3 @@ public interface NotificationOutputPort {
     void sendNotification(NotificationDetails details) throws NotificationException;
 
 }
-
-// TODO: Extract the NotificationDetails class to its own file in the package com.example.domain.entities
-
-// TODO: Extract the NotificationException class to its own file in the package com.example.domain.exceptions

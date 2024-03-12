@@ -13,17 +13,10 @@ import java.security.NoSuchAlgorithmException;
 @Setter
 public class UserEntity {
 
-    public enum UserStatus {
-        ACTIVE,
-        INACTIVE,
-        PENDING_ACTIVATION
-    }
-
     private Long id;
     private String username;
     private String password;
     private String email;
-    private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<String> roles;
@@ -32,6 +25,7 @@ public class UserEntity {
     private String hashAlgorithm;
     private String salt;
     private UserStatus status;
+    private boolean isActive;
 
     public boolean validate() {
         Pattern usernamePattern = Pattern.compile("^[a-zA-Z0-9._-]{3,}$");
@@ -39,29 +33,29 @@ public class UserEntity {
         Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{8,}$");
 
         if (this.email == null || !emailPattern.matcher(this.email).matches()) {
-            throw new IllegalArgumentException("Invalid or missing email format");
+            return false;
         }
         if (this.password == null || !passwordPattern.matcher(this.password).matches()) {
-            throw new IllegalArgumentException("Invalid or missing password complexity");
+            return false;
         }
-        if (!usernamePattern.matcher(this.username).matches()) {
-            throw new IllegalArgumentException("Invalid or missing username");
+        if (this.username == null || !usernamePattern.matcher(this.username).matches()) {
+            return false;
         }
         return true;
     }
 
     public void activate() {
         if (this.status != UserStatus.ACTIVE) {
-            this.isActive = true;
             this.status = UserStatus.ACTIVE;
+            this.isActive = true;
             this.updatedAt = LocalDateTime.now();
         }
     }
 
     public void deactivate() {
         if (this.status != UserStatus.INACTIVE) {
-            this.isActive = false;
             this.status = UserStatus.INACTIVE;
+            this.isActive = false;
             this.updatedAt = LocalDateTime.now();
         }
     }
@@ -72,7 +66,7 @@ public class UserEntity {
 
     public boolean comparePassword(String plainPassword) {
         if (plainPassword == null || plainPassword.isEmpty()) {
-            throw new IllegalArgumentException("Plain password cannot be null or empty");
+            return false;
         }
         String hashedPlainPassword = hashPassword(plainPassword);
         return MessageDigest.isEqual(this.password.getBytes(), hashedPlainPassword.getBytes());
@@ -89,6 +83,18 @@ public class UserEntity {
         }
     }
 
-    // Additional methods and logic as per business requirements
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        UserEntity that = (UserEntity) o;
+
+        return id != null ? id.equals(that.id) : that.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

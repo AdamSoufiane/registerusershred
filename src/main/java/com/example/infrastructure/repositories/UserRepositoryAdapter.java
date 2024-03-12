@@ -6,7 +6,6 @@ import com.example.domain.ports.UserRepositoryPort;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +38,18 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public void deleteById(Long id) throws UserRepositoryException {
+        try {
+            userRepository.deleteById(id);
+        } catch (DataAccessException e) {
+            throw new UserRepositoryException("Unable to delete user by ID", e);
+        }
+    }
+
+    // The following methods are inherited from the UserRepositoryPort interface
+    // and are implemented using the UserCrudRepository methods.
+
+    @Override
     public List<UserEntity> findAll() throws UserRepositoryException {
         try {
             return userRepository.findAll();
@@ -57,15 +68,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public void deleteById(Long id) throws UserRepositoryException {
-        try {
-            userRepository.deleteById(id);
-        } catch (DataAccessException e) {
-            throw new UserRepositoryException("Unable to delete user by ID", e);
-        }
-    }
-
-    @Override
     public boolean existsById(Long id) throws UserRepositoryException {
         try {
             return userRepository.existsById(id);
@@ -74,5 +76,3 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         }
     }
 }
-
-// TODO: Extract the UserCrudRepository interface into its own file in the package 'com.example.infrastructure.repositories'.
