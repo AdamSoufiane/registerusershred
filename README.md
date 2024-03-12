@@ -1,0 +1,1 @@
+This shred is designed to handle user registration and account activation within a Spring Boot application, following Hexagonal Architecture. It includes components for receiving registration data, validating and persisting user information, sending activation emails, and activating user accounts. T
